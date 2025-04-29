@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox alignment="TOP_CENTER" spacing="15" styleClass="root" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1">
+    <padding>
+        <Insets bottom="20" left="20" right="20" top="20"/>
+    </padding>
+
+    <!-- Title -->
+    <Label text="Bookstore Management System" styleClass="title">
+        <font>
+            <Font name="System Bold" size="24"/>
+        </font>
+    </Label>
+
+    <!-- Search Bar -->
+    <TextField fx:id="searchField" promptText="Search by title, author, or ISBN" styleClass="search-field" prefWidth="400"/>
+
+    <!-- Book Table -->
+    <TableView fx:id="bookTable" styleClass="book-table">
+        <columns>
+            <TableColumn fx:id="titleColumn" text="Title" prefWidth="200"/>
+            <TableColumn fx:id="authorColumn" text="Author" prefWidth="150"/>
+            <TableColumn fx:id="isbnColumn" text="ISBN" prefWidth="100"/>
+            <TableColumn fx:id="priceColumn" text="Price" prefWidth="75"/>
+            <TableColumn fx:id="qtyColumn" text="Quantity" prefWidth="75"/>
+        </columns>
+    </TableView>
+
+    <!-- Button Bar -->
+    <HBox alignment="CENTER" spacing="10" styleClass="button-container">
+        <Button fx:id="addToCartButton" text="Add to Cart" styleClass="action-button" onAction="#handleAddToCart"/>
+        <Button fx:id="viewCartButton" text="View Cart" styleClass="action-button" onAction="#handleViewCart"/>
+        <Button fx:id="checkoutButton" text="Checkout" styleClass="action-button" onAction="#handleCheckout"/>
+        <Button fx:id="sellButton" text="Sell Book" styleClass="action-button" onAction="#handleSellBook"/>
+        <Button fx:id="inventoryButton" text="Check Inventory" styleClass="action-button" onAction="#handleCheckInventory"/>
+        <Button fx:id="logoutButton" text="Logout" styleClass="action-button" onAction="#handleLogout"/>
+        <!-- Admin-only buttons -->
+        <Button fx:id="addButton" text="Add Book" styleClass="action-button" onAction="#handleAddBook" visible="false" managed="false"/>
+        <Button fx:id="editButton" text="Edit Book" styleClass="action-button" onAction="#handleEditBook" visible="false" managed="false"/>
+        <Button fx:id="deleteButton" text="Delete Book" styleClass="action-button" onAction="#handleDeleteBook" visible="false" managed="false"/>
+        <Button fx:id="manageUsersButton" text="Manage Users" styleClass="action-button" onAction="#handleManageUsers" visible="false" managed="false"/>
+    </HBox>
+
+    <!-- Status Label -->
+    <Label fx:id="statusLabel" styleClass="status-label" text=""/>
+</VBox>

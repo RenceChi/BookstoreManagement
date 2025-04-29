@@ -1,0 +1,68 @@
+.root {
+    -fx-background-color: linear-gradient(to bottom, #e6f0fa, #f5faff);
+    -fx-alignment: center;
+}
+
+.title {
+    -fx-text-fill: #333;
+    -fx-font-weight: bold;
+    -fx-font-size: 20;
+}
+
+.field-container {
+    -fx-alignment: center-left;
+}
+
+.icon {
+    -fx-font-size: 16;
+    -fx-text-fill: #666;
+}
+
+.text-field {
+    -fx-background-color: #d6e0f5;
+    -fx-background-radius: 25;
+    -fx-border-radius: 25;
+    -fx-border-color: #ccc;
+    -fx-border-width: 1;
+    -fx-padding: 10;
+    -fx-font-size: 14;
+    -fx-prompt-text-fill: #666;
+}
+
+.text-field:focused {
+    -fx-background-color: #e6efff;
+    -fx-border-color: #3b82f6;
+}
+
+.action-button {
+    -fx-background-color: #a3bffa;
+    -fx-text-fill: #333;
+    -fx-font-size: 14;
+    -fx-font-weight: bold;
+    -fx-background-radius: 25;
+    -fx-border-radius: 25;
+    -fx-padding: 10;
+    -fx-border-color: #ccc;
+    -fx-border-width: 1;
+    -fx-pref-width: 280;
+}
+
+.action-button:hover {
+    -fx-background-color: #7f9cf5;
+}
+
+.signup-link {
+    -fx-text-fill: #3b82f6;
+    -fx-font-size: 12;
+    -fx-cursor: hand;
+}
+
+.signup-link:hover {
+    -fx-text-fill: #2563eb;
+    -fx-underline: true;
+}
+
+.error-label {
+    -fx-text-fill: red;
+    -fx-font-size: 12;
+}

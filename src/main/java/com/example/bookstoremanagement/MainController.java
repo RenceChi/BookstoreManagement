@@ -5,6 +5,8 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -21,8 +23,26 @@ public class MainController {
     private User currentUser;
     private Stage primaryStage;
     private ObservableList<Book> bookList;
-    private Label statusLabel;
     private Cart cart;
+
+    @FXML private TableView<Book> bookTable;
+    @FXML private TableColumn<Book, String> titleColumn;
+    @FXML private TableColumn<Book, String> authorColumn;
+    @FXML private TableColumn<Book, String> isbnColumn;
+    @FXML private TableColumn<Book, Integer> priceColumn;
+    @FXML private TableColumn<Book, Integer> qtyColumn;
+    @FXML private TextField searchField;
+    @FXML private Button addToCartButton;
+    @FXML private Button viewCartButton;
+    @FXML private Button checkoutButton;
+    @FXML private Button sellButton;
+    @FXML private Button inventoryButton;
+    @FXML private Button logoutButton;
+    @FXML private Button addButton;
+    @FXML private Button editButton;
+    @FXML private Button deleteButton;
+    @FXML private Button manageUsersButton;
+    @FXML private Label statusLabel;
 
     public MainController(BookManager bookManager, UserManager userManager, User currentUser, Stage primaryStage) {
         this.bookManager = bookManager;
@@ -34,84 +54,64 @@ public class MainController {
     }
 
     public void showMainScreen() {
-        VBox root = new VBox(10);
-        root.setPadding(new Insets(10));
+        try {
+            // Load the FXML file
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/bookstoremanagement/mainView.fxml"));
+            loader.setController(this); // Set this instance as the controller
+            Scene scene = new Scene(loader.load(), 800, 600);
+            scene.getStylesheets().add(getClass().getResource("/com/example/bookstoremanagement/mainView.css").toExternalForm());
 
-        TextField searchField = new TextField();
-        searchField.setPromptText("Search by title, author, or ISBN");
+            // Set up the stage
+            primaryStage.setTitle("Bookstore Management System");
+            primaryStage.setScene(scene);
+            primaryStage.show();
 
-        TableView<Book> bookTable = new TableView<>();
-        TableColumn<Book, String> titleColumn = new TableColumn<>("Title");
-        titleColumn.setPrefWidth(200);
-        titleColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
-        TableColumn<Book, String> authorColumn = new TableColumn<>("Author");
-        authorColumn.setPrefWidth(150);
-        authorColumn.setCellValueFactory(new PropertyValueFactory<>("author"));
-        TableColumn<Book, String> isbnColumn = new TableColumn<>("ISBN");
-        isbnColumn.setPrefWidth(100);
-        isbnColumn.setCellValueFactory(new PropertyValueFactory<>("isbn"));
-        TableColumn<Book, Integer> priceColumn = new TableColumn<>("Price");
-        priceColumn.setPrefWidth(75);
-        priceColumn.setCellValueFactory(new PropertyValueFactory<>("price"));
-        TableColumn<Book, Integer> qtyColumn = new TableColumn<>("Quantity");
-        qtyColumn.setPrefWidth(75);
-        qtyColumn.setCellValueFactory(new PropertyValueFactory<>("qty"));
-        bookTable.getColumns().addAll(titleColumn, authorColumn, isbnColumn, priceColumn, qtyColumn);
-        bookTable.setItems(bookList);
+            // Set up table data
+            bookTable.setItems(bookList);
+            titleColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
+            authorColumn.setCellValueFactory(new PropertyValueFactory<>("author"));
+            isbnColumn.setCellValueFactory(new PropertyValueFactory<>("isbn"));
+            priceColumn.setCellValueFactory(new PropertyValueFactory<>("price"));
+            qtyColumn.setCellValueFactory(new PropertyValueFactory<>("qty"));
 
-        HBox buttonBox = new HBox(10);
-        Button addToCartButton = new Button("Add to Cart");
-        Button viewCartButton = new Button("View Cart");
-        Button checkoutButton = new Button("Checkout");
-        Button sellButton = new Button("Sell Book");
-        Button inventoryButton = new Button("Check Inventory");
-        Button logoutButton = new Button("Logout");
-        buttonBox.getChildren().addAll(addToCartButton, viewCartButton, checkoutButton, sellButton, inventoryButton, logoutButton);
+            // Set up search functionality
+            searchField.textProperty().addListener((obs, oldVal, newVal) -> {
+                if (newVal.isEmpty()) {
+                    bookList.setAll(bookManager.getBooks());
+                } else {
+                    bookList.setAll(bookManager.searchBooks(newVal));
+                }
+            });
 
-        boolean isAdmin = currentUser.getUsername().equals("admin");
-        Button addButton = new Button("Add Book");
-        Button editButton = new Button("Edit Book");
-        Button deleteButton = new Button("Delete Book");
-        Button manageUsersButton = new Button("Manage Users");
-        if (isAdmin) {
-            buttonBox.getChildren().addAll(addButton, editButton, deleteButton, manageUsersButton);
-        }
+            // Set up button disable bindings
+            addToCartButton.disableProperty().bind(Bindings.isNull(bookTable.getSelectionModel().selectedItemProperty()));
+            editButton.disableProperty().bind(Bindings.isNull(bookTable.getSelectionModel().selectedItemProperty()));
+            deleteButton.disableProperty().bind(Bindings.isNull(bookTable.getSelectionModel().selectedItemProperty()));
+            sellButton.disableProperty().bind(Bindings.isNull(bookTable.getSelectionModel().selectedItemProperty()));
 
-        statusLabel = new Label("");
-
-        root.getChildren().addAll(searchField, bookTable, buttonBox, statusLabel);
-
-        searchField.textProperty().addListener((obs, oldVal, newVal) -> {
-            if (newVal.isEmpty()) {
-                bookList.setAll(bookManager.getBooks());
-            } else {
-                bookList.setAll(bookManager.searchBooks(newVal));
+            // Show admin buttons if user is admin
+            boolean isAdmin = currentUser.getUsername().equals("admin");
+            if (isAdmin) {
+                addButton.setVisible(true);
+                addButton.setManaged(true);
+                editButton.setVisible(true);
+                editButton.setManaged(true);
+                deleteButton.setVisible(true);
+                deleteButton.setManaged(true);
+                manageUsersButton.setVisible(true);
+                manageUsersButton.setManaged(true);
             }
-        });
 
-        addToCartButton.setOnAction(e -> handleAddToCart(bookTable.getSelectionModel().getSelectedItem()));
-        viewCartButton.setOnAction(e -> handleViewCart());
-        checkoutButton.setOnAction(e -> handleCheckout());
-        sellButton.setOnAction(e -> handleSellBook(bookTable.getSelectionModel().getSelectedItem()));
-        inventoryButton.setOnAction(e -> handleCheckInventory());
-        logoutButton.setOnAction(e -> handleLogout());
-        addButton.setOnAction(e -> handleAddBook());
-        editButton.setOnAction(e -> handleEditBook(bookTable.getSelectionModel().getSelectedItem()));
-        deleteButton.setOnAction(e -> handleDeleteBook(bookTable.getSelectionModel().getSelectedItem()));
-        manageUsersButton.setOnAction(e -> handleManageUsers());
-
-        addToCartButton.disableProperty().bind(Bindings.isNull(bookTable.getSelectionModel().selectedItemProperty()));
-        editButton.disableProperty().bind(Bindings.isNull(bookTable.getSelectionModel().selectedItemProperty()));
-        deleteButton.disableProperty().bind(Bindings.isNull(bookTable.getSelectionModel().selectedItemProperty()));
-        sellButton.disableProperty().bind(Bindings.isNull(bookTable.getSelectionModel().selectedItemProperty()));
-
-        Scene scene = new Scene(root, 800, 600);
-        primaryStage.setTitle("Bookstore Management System");
-        primaryStage.setScene(scene);
-        primaryStage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("Error loading main screen: " + e.getMessage());
+            showError("Error loading main screen: " + e.getMessage());
+        }
     }
 
-    private void handleAddToCart(Book book) {
+    @FXML
+    private void handleAddToCart() {
+        Book book = bookTable.getSelectionModel().getSelectedItem();
         if (book == null) {
             showError("Please select a book to add to cart.");
             return;
@@ -139,6 +139,7 @@ public class MainController {
         });
     }
 
+    @FXML
     private void handleViewCart() {
         Stage cartStage = new Stage();
         VBox root = new VBox(10);
@@ -182,6 +183,7 @@ public class MainController {
         cartStage.show();
     }
 
+    @FXML
     private void handleCheckout() {
         if (cart.getItems().isEmpty()) {
             showError("Cart is empty.");
@@ -196,6 +198,7 @@ public class MainController {
         }
     }
 
+    @FXML
     private void handleAddBook() {
         Stage addStage = new Stage();
         VBox root = new VBox(10);
@@ -243,7 +246,9 @@ public class MainController {
         addStage.show();
     }
 
-    private void handleEditBook(Book book) {
+    @FXML
+    private void handleEditBook() {
+        Book book = bookTable.getSelectionModel().getSelectedItem();
         if (book == null) {
             showError("Please select a book to edit.");
             return;
@@ -296,7 +301,9 @@ public class MainController {
         editStage.show();
     }
 
-    private void handleDeleteBook(Book book) {
+    @FXML
+    private void handleDeleteBook() {
+        Book book = bookTable.getSelectionModel().getSelectedItem();
         if (book == null) {
             showError("Please select a book to delete.");
             return;
@@ -313,7 +320,9 @@ public class MainController {
         }
     }
 
-    private void handleSellBook(Book book) {
+    @FXML
+    private void handleSellBook() {
+        Book book = bookTable.getSelectionModel().getSelectedItem();
         if (book == null) {
             showError("Please select a book to sell.");
             return;
@@ -343,6 +352,7 @@ public class MainController {
         });
     }
 
+    @FXML
     private void handleCheckInventory() {
         int totalBooks = bookManager.getBooks().stream().mapToInt(Book::getQty).sum();
         StringBuilder inventorySummary = new StringBuilder("Inventory Summary:\n");
@@ -357,11 +367,13 @@ public class MainController {
         alert.showAndWait();
     }
 
+    @FXML
     private void handleLogout() {
         LoginController loginController = new LoginController(userManager, primaryStage);
         loginController.showLoginScreen();
     }
 
+    @FXML
     private void handleManageUsers() {
         Stage userStage = new Stage();
         VBox root = new VBox(10);
