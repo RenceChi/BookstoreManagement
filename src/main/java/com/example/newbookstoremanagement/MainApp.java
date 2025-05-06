@@ -1,5 +1,7 @@
-package com.example.bookstoremanagement;
+package com.example.newbookstoremanagement;
 
+import com.example.newbookstoremanagement.controller.UserManager;
+import com.example.newbookstoremanagement.view.LoginController;
 import javafx.application.Application;
 import javafx.scene.control.Alert;
 import javafx.stage.Stage;

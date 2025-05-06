@@ -1,6 +1,6 @@
-username,password
-admin,admin123
-staff1,staffpass1
-staff2,staffpass2
-customer1,custpass1
-"comma,user",commapass
+username,password,role
+admin,admin123,admin
+staff1,staffpass1,staff
+staff2,staffpass2,staff
+customer1,custpass1,customer
+"comma,user",commapass,customer

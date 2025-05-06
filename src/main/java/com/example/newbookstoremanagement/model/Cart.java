@@ -1,4 +1,4 @@
-package com.example.bookstoremanagement;
+package com.example.newbookstoremanagement.model;
 
 import java.util.ArrayList;
 import java.util.List;

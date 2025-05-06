@@ -1,4 +1,6 @@
-package com.example.bookstoremanagement;
+package com.example.newbookstoremanagement.controller;
+
+import com.example.newbookstoremanagement.model.User;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -24,6 +26,7 @@ public class UserManager {
             User admin = new User();
             admin.setUsername("admin");
             admin.setPassword("admin123");
+            admin.setRole("admin");
             users.add(admin);
             updateUsers();
             System.out.println("Created new users.csv at: " + file.getAbsolutePath());
@@ -40,16 +43,18 @@ public class UserManager {
                     continue; // Skip header
                 }
                 String[] userInfo = parseCSVLine(line);
-                if (userInfo.length >= 2) {
+                if (userInfo.length >= 3) { // Now expecting 3 fields: username, password, role
                     String username = userInfo[0].trim();
                     String password = userInfo[1].trim();
-                    if (username.isEmpty() || password.isEmpty()) {
-                        System.err.println("Skipping line " + lineNumber + ": Empty username or password");
+                    String role = userInfo[2].trim();
+                    if (username.isEmpty() || password.isEmpty() || role.isEmpty()) {
+                        System.err.println("Skipping line " + lineNumber + ": Empty username, password, or role");
                         continue;
                     }
                     User user = new User();
                     user.setUsername(username);
                     user.setPassword(password);
+                    user.setRole(role);
                     users.add(user);
                 } else {
                     System.err.println("Skipping line " + lineNumber + ": Malformed CSV line - " + line);
@@ -68,6 +73,10 @@ public class UserManager {
             if (u.getUsername().equals(user.getUsername())) {
                 throw new IllegalArgumentException("User already exists.");
             }
+        }
+        // Set default role to "customer" if not specified
+        if (user.getRole() == null || user.getRole().isEmpty()) {
+            user.setRole("customer");
         }
         users.add(user);
         updateUsers();
@@ -101,15 +110,16 @@ public class UserManager {
 
         // Write to temporary file
         try (FileWriter writer = new FileWriter(tempFile)) {
-            writer.write("username,password\n");
+            writer.write("username,password,role\n"); // Updated header
             for (User user : users) {
-                if (user.getUsername() == null || user.getPassword() == null) {
+                if (user.getUsername() == null || user.getPassword() == null || user.getRole() == null) {
                     System.err.println("Skipping invalid user during export: " + user);
                     continue;
                 }
-                writer.write(String.format("%s,%s\n",
+                writer.write(String.format("%s,%s,%s\n",
                         escapeCSV(user.getUsername()),
-                        escapeCSV(user.getPassword())));
+                        escapeCSV(user.getPassword()),
+                        escapeCSV(user.getRole())));
             }
             writer.flush();
         } catch (IOException e) {

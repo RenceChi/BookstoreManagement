@@ -1,4 +1,7 @@
-package com.example.bookstoremanagement;
+package com.example.newbookstoremanagement.controller;
+
+import com.example.newbookstoremanagement.model.Book;
+import com.example.newbookstoremanagement.model.Cart;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -6,9 +9,16 @@ import java.util.ArrayList;
 public class BookManager {
     private ArrayList<Book> books;
     private final String csvFilePath = "books.csv";
+    private final String coverImageDir = "book_covers"; // Folder for cover images
 
     public BookManager() {
         books = new ArrayList<>();
+        // Create book_covers directory if it doesn't exist
+        File coverDir = new File(coverImageDir);
+        if (!coverDir.exists()) {
+            coverDir.mkdirs();
+            System.out.println("Created book_covers directory at: " + coverDir.getAbsolutePath());
+        }
         loadBooksFromCSV();
     }
 
@@ -19,6 +29,10 @@ public class BookManager {
         for (Book book : books) {
             if (book.getIsbn().equals(b.getIsbn())) {
                 book.setQty(book.getQty() + b.getQty());
+                // Preserve coverImage if not updating
+                if (b.getCoverImage() != null && !b.getCoverImage().isEmpty()) {
+                    book.setCoverImage(b.getCoverImage());
+                }
                 updateBooks();
                 return;
             }
@@ -111,13 +125,14 @@ public class BookManager {
                     continue; // Skip header
                 }
                 String[] fields = parseCSVLine(line);
-                if (fields.length >= 5) {
+                if (fields.length >= 5) { // Expect at least 5 fields, coverImage is optional
                     try {
                         String title = fields[0].trim();
                         String author = fields[1].trim();
                         String isbn = fields[2].trim();
                         int qty = Integer.parseInt(fields[3].trim());
                         int price = Integer.parseInt(fields[4].trim());
+                        String coverImage = fields.length > 5 ? fields[5].trim() : "";
                         if (title.isEmpty() || author.isEmpty() || isbn.isEmpty()) {
                             System.err.println("Skipping line " + lineNumber + ": Empty title, author, or ISBN");
                             continue;
@@ -132,6 +147,12 @@ public class BookManager {
                         book.setIsbn(isbn);
                         book.setQty(qty);
                         book.setPrice(price);
+                        // Set cover image filename based on ISBN if not provided in CSV
+                        if (coverImage.isEmpty()) {
+                            book.setCoverImage(isbn + "_cover.jpg"); // Changed to .jpg
+                        } else {
+                            book.setCoverImage(coverImage);
+                        }
                         books.add(book);
                     } catch (NumberFormatException e) {
                         System.err.println("Skipping line " + lineNumber + ": Invalid number format in CSV - " + line);
@@ -152,18 +173,19 @@ public class BookManager {
 
         // Write to temporary file
         try (FileWriter writer = new FileWriter(tempFile)) {
-            writer.write("title,author,isbn,qty,price\n");
+            writer.write("title,author,isbn,qty,price,coverImage\n"); // Updated header
             for (Book b : books) {
                 if (b.getTitle() == null || b.getAuthor() == null || b.getIsbn() == null) {
                     System.err.println("Skipping invalid book during export: " + b);
                     continue;
                 }
-                writer.write(String.format("%s,%s,%s,%d,%d\n",
+                writer.write(String.format("%s,%s,%s,%d,%d,%s\n",
                         escapeCSV(b.getTitle()),
                         escapeCSV(b.getAuthor()),
                         escapeCSV(b.getIsbn()),
                         b.getQty(),
-                        b.getPrice()));
+                        b.getPrice(),
+                        escapeCSV(b.getCoverImage() == null ? "" : b.getCoverImage())));
             }
             writer.flush();
         } catch (IOException e) {
@@ -208,5 +230,13 @@ public class BookManager {
         }
         fields.add(field.toString());
         return fields.toArray(new String[0]);
+    }
+
+    // Utility to get the absolute path of a cover image
+    public String getCoverImagePath(String coverImage) {
+        if (coverImage == null || coverImage.isEmpty()) {
+            return null;
+        }
+        return new File(coverImageDir, coverImage).getAbsolutePath();
     }
 }
