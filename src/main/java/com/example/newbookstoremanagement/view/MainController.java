@@ -201,19 +201,19 @@ public class MainController {
         qtyColumn.setUserData(qtyHeaderLabel);
 
         // Adjust column widths to fill the table horizontally
-        titleColumn.prefWidthProperty().bind(bookTable.widthProperty().multiply(0.40));
-        authorColumn.prefWidthProperty().bind(bookTable.widthProperty().multiply(0.25));
-        isbnColumn.prefWidthProperty().bind(bookTable.widthProperty().multiply(0.15));
+        titleColumn.prefWidthProperty().bind(bookTable.widthProperty().multiply(0.25));
+        authorColumn.prefWidthProperty().bind(bookTable.widthProperty().multiply(0.20));
+        isbnColumn.prefWidthProperty().bind(bookTable.widthProperty().multiply(0.20));
         priceColumn.prefWidthProperty().bind(bookTable.widthProperty().multiply(0.10));
         priceColumn.setStyle("-fx-alignment: CENTER-RIGHT;");
-        qtyColumn.prefWidthProperty().bind(bookTable.widthProperty().multiply(0.10));
+        qtyColumn.prefWidthProperty().bind(bookTable.widthProperty().multiply(0.15));
 
         bookTable.getColumns().addAll(titleColumn, authorColumn, isbnColumn, priceColumn, qtyColumn);
         bookTable.setItems(bookList);
         bookTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY); // Ensures columns fill the table
 
         // Set adjustable height (50% of window height)
-        bookTable.prefHeightProperty().bind(primaryStage.heightProperty().multiply(0.5));
+        bookTable.prefHeightProperty().bind(primaryStage.heightProperty().multiply(0.8));
         bookTable.prefWidthProperty().bind(primaryStage.widthProperty().multiply(0.65)); // 65% of window width
 
         centerBox.getChildren().addAll(searchField, bookTable);
