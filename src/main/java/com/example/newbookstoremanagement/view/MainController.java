@@ -27,6 +27,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
 
 public class MainController {
     private BookManager bookManager;
@@ -159,6 +160,12 @@ public class MainController {
         searchField.setPromptText("Search by title, author, or ISBN");
         searchField.setPrefWidth(300);
         searchField.setStyle("-fx-background-radius: 15; -fx-padding: 5 10 5 10;");
+
+        // Add text change listener to search field
+        searchField.textProperty().addListener((observable, oldValue, newValue) -> {
+            ArrayList<Book> searchResults = bookManager.searchBooks(newValue);
+            bookList.setAll(searchResults);
+        });
 
         TableColumn<Book, String> titleColumn = new TableColumn<>();
         TableColumn<Book, String> authorColumn = new TableColumn<>();
@@ -310,8 +317,10 @@ public class MainController {
 
     private void styleButton(Button button, boolean isLogout) {
         button.setPrefWidth(160);
+        String buttonColor = isDarkMode ? "#3c4e6e" : (isLogout ? "#ff4444" : "#3c4e6e");
+        String hoverColor = isDarkMode ? "#3c4e6e" : (isLogout ? "#ff6666" : "#3c4e6e");
         button.setStyle(
-                "-fx-background-color: " + (isLogout ? "#ff4444" : "#2b3a55") + ";" + // Dark blue color
+                "-fx-background-color: " + buttonColor + ";" +
                         "-fx-text-fill: white;" +
                         "-fx-font-weight: bold;" +
                         "-fx-background-radius: 5;" +
@@ -319,7 +328,7 @@ public class MainController {
                         "-fx-cursor: hand;"
         );
         button.setOnMouseEntered(e -> button.setStyle(
-                "-fx-background-color: " + (isLogout ? "#ff6666" : "#3c4e6e") + ";" + // Slightly lighter dark blue
+                "-fx-background-color: " + hoverColor + ";" +
                         "-fx-text-fill: white;" +
                         "-fx-font-weight: bold;" +
                         "-fx-background-radius: 5;" +
@@ -327,7 +336,7 @@ public class MainController {
                         "-fx-cursor: hand;"
         ));
         button.setOnMouseExited(e -> button.setStyle(
-                "-fx-background-color: " + (isLogout ? "#ff4444" : "#2b3a55") + ";" + // Dark blue color
+                "-fx-background-color: " + buttonColor + ";" +
                         "-fx-text-fill: white;" +
                         "-fx-font-weight: bold;" +
                         "-fx-background-radius: 5;" +
@@ -338,8 +347,10 @@ public class MainController {
 
     private void styleButton(ToggleButton toggleButton) {
         toggleButton.setPrefWidth(160);
+        String buttonColor = isDarkMode ? "#2b3a55" : "#2b3a55";
+        String hoverColor = isDarkMode ? "#2b3a55" : "#3c4e6e";
         toggleButton.setStyle(
-                "-fx-background-color: #2b3a55;" + // Dark blue color
+                "-fx-background-color: " + buttonColor + ";" +
                         "-fx-text-fill: white;" +
                         "-fx-font-weight: bold;" +
                         "-fx-background-radius: 5;" +
@@ -347,7 +358,7 @@ public class MainController {
                         "-fx-cursor: hand;"
         );
         toggleButton.setOnMouseEntered(e -> toggleButton.setStyle(
-                "-fx-background-color: #3c4e6e;" + // Slightly lighter dark blue
+                "-fx-background-color: " + hoverColor + ";" +
                         "-fx-text-fill: white;" +
                         "-fx-font-weight: bold;" +
                         "-fx-background-radius: 5;" +
@@ -355,7 +366,7 @@ public class MainController {
                         "-fx-cursor: hand;"
         ));
         toggleButton.setOnMouseExited(e -> toggleButton.setStyle(
-                "-fx-background-color: #2b3a55;" + // Dark blue color
+                "-fx-background-color: " + buttonColor + ";" +
                         "-fx-text-fill: white;" +
                         "-fx-font-weight: bold;" +
                         "-fx-background-radius: 5;" +
@@ -372,8 +383,8 @@ public class MainController {
     private void updateTheme() {
         if (isDarkMode) {
             root.setStyle("-fx-background-color: #2b2b2b;");
-            root.getLeft().setStyle("-fx-background-color: #3c3f41;");
-            root.getRight().setStyle("-fx-background-color: #3c3f41; -fx-border-color: #555; -fx-border-width: 1;");
+            root.getLeft().setStyle("-fx-background-color: #555;");
+            root.getRight().setStyle("-fx-background-color: #555; -fx-border-color: #555; -fx-border-width: 1;");
             statusLabel.setTextFill(Color.WHITE);
             appTitleLabel.setTextFill(Color.WHITE);
             endUserLabel.setTextFill(Color.WHITE);
@@ -385,23 +396,18 @@ public class MainController {
             isbnLabel.setTextFill(Color.WHITE);
             priceLabel.setTextFill(Color.WHITE);
             qtyLabel.setTextFill(Color.WHITE);
-            searchField.setStyle("-fx-background-radius: 15; -fx-padding: 5 10 5 10; -fx-text-fill: white; -fx-prompt-text-fill: #aaaaaa;");
-            bookTable.setStyle("-fx-control-inner-background: #3c3f41; -fx-text-fill: white; -fx-table-cell-border-color: transparent;");
+            searchField.setStyle("-fx-background-radius: 15; -fx-padding: 5 10 5 10; -fx-text-fill: black; -fx-prompt-text-fill: #aaaaaa;");
+            bookTable.setStyle("-fx-control-inner-background: #3c3f41; -fx-table-cell-border-color: transparent; -fx-background-color: #3c3f41;");
             // Style column headers
             for (TableColumn<Book, ?> column : bookTable.getColumns()) {
                 Label headerLabel = (Label) column.getUserData();
                 if (headerLabel != null) {
-                    if (column.getText().equals("Quantity")) {
-                        headerLabel.setStyle("-fx-font-weight: bold; -fx-background-color: #d4a017; -fx-text-fill: black; -fx-padding: 5;");
-                    } else {
-                        headerLabel.setStyle("-fx-font-weight: bold; -fx-background-color: #4a4a4a; -fx-text-fill: white; -fx-padding: 5;");
-                    }
+                    headerLabel.setStyle("-fx-font-weight: bold; -fx-background-color: #e3e3e3; -fx-text-fill: #3c4e6e; -fx-padding: 5;");
                 }
-                column.setStyle("-fx-alignment: CENTER-LEFT; -fx-text-fill: white;");
             }
         } else {
-            root.setStyle("-fx-background-color: #f5f5f5;");
-            root.getLeft().setStyle("-fx-background-color: #f0f0f0;");
+            root.setStyle("-fx-background-color: #faf2e8;");
+            root.getLeft().setStyle("-fx-background-color: #faf2e8;");
             root.getRight().setStyle("-fx-background-color: #ffffff; -fx-border-color: #d0d0d0; -fx-border-width: 1;");
             statusLabel.setTextFill(Color.BLACK);
             appTitleLabel.setTextFill(Color.BLACK);
@@ -415,20 +421,17 @@ public class MainController {
             priceLabel.setTextFill(Color.BLACK);
             qtyLabel.setTextFill(Color.BLACK);
             searchField.setStyle("-fx-background-radius: 15; -fx-padding: 5 10 5 10; -fx-text-fill: black; -fx-prompt-text-fill: #666666;");
-            bookTable.setStyle("-fx-control-inner-background: #ffffff; -fx-text-fill: black; -fx-table-cell-border-color: transparent;");
+            bookTable.setStyle("-fx-control-inner-background: #ffffff; -fx-table-cell-border-color: transparent; -fx-background-color: #ffffff;");
             // Style column headers
             for (TableColumn<Book, ?> column : bookTable.getColumns()) {
                 Label headerLabel = (Label) column.getUserData();
                 if (headerLabel != null) {
-                    if (column.getText().equals("Quantity")) {
-                        headerLabel.setStyle("-fx-font-weight: bold; -fx-background-color: #ffc107; -fx-text-fill: black; -fx-padding: 5;");
-                    } else {
-                        headerLabel.setStyle("-fx-font-weight: bold; -fx-background-color: #e0e0e0; -fx-text-fill: black; -fx-padding: 5;");
-                    }
+                    headerLabel.setStyle("-fx-font-weight: bold; -fx-background-color: #e3e3e3; -fx-text-fill: #2b3a55; -fx-padding: 5;");
                 }
-                column.setStyle("-fx-alignment: CENTER-LEFT; -fx-text-fill: black;");
             }
         }
+        // Refresh the table to apply cell factory styles
+        bookTable.refresh();
     }
 
     private void handleAddToCart(Book book) {
@@ -549,6 +552,9 @@ public class MainController {
                 selectedImage[0] = file;
                 imageLabel.setText(file.getName());
             }
+            Scene scene = new Scene(root);
+
+            // Set the stage properties
         });
 
         root.getChildren().addAll(
@@ -597,8 +603,13 @@ public class MainController {
         });
 
         Scene scene = new Scene(root, 300, 350); // Increased height for image fields
-        addStage.setTitle("Add Book");
         addStage.setScene(scene);
+        addStage.setTitle("Add Book");
+
+        addStage.setWidth(400);  // Set preferred width
+        addStage.setHeight(600);
+        addStage.setResizable(false);
+        addStage.centerOnScreen();
         addStage.show();
     }
 

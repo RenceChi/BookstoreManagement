@@ -224,6 +224,7 @@ public class LoginController {
                 newUser.setPassword(password);
                 newUser.setRole("customer"); // Set role to customer
                 userManager.addUser(newUser);
+                userManager.updateUsers();
                 signupStage.close();
                 errorLabel.setText("Account created! Please log in.");
             } catch (Exception ex) {

@@ -104,7 +104,7 @@ public class UserManager {
         return null;
     }
 
-    private void updateUsers() throws IOException {
+    public void updateUsers() throws IOException {
         File file = new File(csvFilePath);
         File tempFile = new File(csvFilePath + ".tmp");
 

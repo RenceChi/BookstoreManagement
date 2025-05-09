@@ -14,7 +14,7 @@ public class MainApp extends Application {
             LoginController loginController = new LoginController(userManager, primaryStage);
             loginController.showLoginScreen();
         } catch (Exception e) {
-            System.err.println("Error starting application: " + e.getMessage());
+            System.err.println("Error starting applicaztion: " + e.getMessage());
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Startup Error");
             alert.setHeaderText(null);
