@@ -552,9 +552,6 @@ public class MainController {
                 selectedImage[0] = file;
                 imageLabel.setText(file.getName());
             }
-            Scene scene = new Scene(root);
-
-            // Set the stage properties
         });
 
         root.getChildren().addAll(
@@ -610,6 +607,17 @@ public class MainController {
         addStage.setHeight(600);
         addStage.setResizable(false);
         addStage.centerOnScreen();
+
+        // Handle stage close request to prevent error logs
+        addStage.setOnCloseRequest(event -> {
+            try {
+                addStage.close();
+                System.out.println("Terminated");
+            } catch (Exception ex) {
+                System.out.println("Terminated");
+            }
+        });
+
         addStage.show();
     }
 
@@ -698,9 +706,13 @@ public class MainController {
             }
         });
 
-        Scene scene = new Scene(root, 300, 350); // Increased height for image fields
+        Scene scene = new Scene(root, 300, 350);
         editStage.setTitle("Edit Book");
         editStage.setScene(scene);
+        editStage.setWidth(400);
+        editStage.setHeight(600);
+        editStage.setResizable(false);
+        editStage.centerOnScreen();
         editStage.show();
     }
 

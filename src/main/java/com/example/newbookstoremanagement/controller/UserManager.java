@@ -24,8 +24,8 @@ public class UserManager {
         if (!file.exists()) {
             // Create file with default admin user
             User admin = new User();
-            admin.setUsername("admin");
-            admin.setPassword("admin123");
+            admin.setUsername(System.getenv().getOrDefault("ADMIN_USERNAME", "administrator"));
+            admin.setPassword(System.getenv().getOrDefault("ADMIN_PASSWORD", "SecurePass#2025"));
             admin.setRole("admin");
             users.add(admin);
             updateUsers();
