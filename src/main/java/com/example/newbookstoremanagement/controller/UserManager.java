@@ -24,8 +24,16 @@ public class UserManager {
         if (!file.exists()) {
             // Create file with default admin user
             User admin = new User();
-            admin.setUsername(System.getenv().getOrDefault("ADMIN_USERNAME", "administrator"));
-            admin.setPassword(System.getenv().getOrDefault("ADMIN_PASSWORD", "SecurePass#2025"));
+            String adminUsername = System.getenv("ADMIN_USERNAME");
+            String adminPassword = System.getenv("ADMIN_PASSWORD");
+            if (adminUsername == null || adminUsername.isEmpty()) {
+                throw new IllegalStateException("Environment variable ADMIN_USERNAME must be set for admin user creation.");
+            }
+            if (adminPassword == null || adminPassword.isEmpty()) {
+                throw new IllegalStateException("Environment variable ADMIN_PASSWORD must be set for admin user creation.");
+            }
+            admin.setUsername(adminUsername);
+            admin.setPassword(adminPassword);
             admin.setRole("admin");
             users.add(admin);
             updateUsers();
